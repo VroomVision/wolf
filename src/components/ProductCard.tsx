@@ -62,7 +62,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </span>
               )}
             </div>
-            {/* Add to Cart button removed as per user request */}
+            <button
+              onClick={handleAddToCart}
+              className="ml-4 flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-700 text-white font-semibold shadow-lg hover:scale-105 hover:from-purple-600 hover:to-purple-800 transition-all"
+              title="Add to Cart"
+            >
+              <ShoppingCart size={22} />
+            </button>
           </div>
         </div>
       </motion.div>
