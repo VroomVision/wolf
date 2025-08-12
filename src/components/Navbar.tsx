@@ -7,7 +7,8 @@ import Link from "next/link";
 // Niche ke imports apne project ke hisaab se adjust karen
 import Logo from "./Logo";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Instagram } from "lucide-react";
+import { Instagram } from "lucide-react";
+import BagIcon from "./BagIcon";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 
@@ -20,11 +21,25 @@ const navItems = [
 
 const Navbar: React.FC = () => {
 	const router = useRouter();
-	const { cart, updateQuantity, removeFromCart } = useCart();
 	const [scrolled, setScrolled] = useState(false);
 	const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
 	const [showCard, setShowCard] = useState(false);
 	const [checkoutDirection, setCheckoutDirection] = useState('slide_right');
+	const { cart, updateQuantity, removeFromCart } = useCart();
+
+	// Close cart when clicking outside
+	useEffect(() => {
+		if (!showCard) return;
+		function handleClick(e: MouseEvent) {
+			const cartSlider = document.querySelector('.cart-slider-area');
+			if (cartSlider && !cartSlider.contains(e.target as Node)) {
+				setShowCard(false);
+			}
+		}
+		document.addEventListener('mousedown', handleClick);
+		return () => document.removeEventListener('mousedown', handleClick);
+	}, [showCard]);
+	// Removed duplicate declarations
 
 	useEffect(() => {
 		if (pendingScrollId && window.location.pathname === '/') {
@@ -98,16 +113,24 @@ const Navbar: React.FC = () => {
 							rel="noopener noreferrer"
 							className="text-white hover:text-purple-400 transition-colors"
 						>
-							<Instagram size={22} />
+							<Instagram size={25} />
 						</a>
 						<Button
 							variant="ghost"
-							className="relative text-white hover:bg-purple-500/20 px-3 py-1 rounded-full"
+							className="relative group text-white px-3 py-1 rounded-full bg-transparent hover:bg-transparent focus:bg-transparent"
 							onClick={() => setShowCard(true)}
 						>
-							<ShoppingCart size={22} />
+							<span className="inline-block">
+								<BagIcon width={26} height={26} color="white" className="bagicon-navbar" />
+							</span>
+							<style>{`
+								.group:hover .bagicon-navbar rect,
+								.group:hover .bagicon-navbar path {
+									stroke: #7042f8;
+								}
+							`}</style>
 							{cart.length > 0 && (
-								<span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full px-1.5 py-0.5">
+								<span className="absolute -top-1 -right-1 flex items-center justify-center" style={{background: '#7042f8', color: 'white', fontSize: '0.65rem', width: '18px', height: '18px', borderRadius: '50%'}}>
 									{cart.length}
 								</span>
 							)}
@@ -123,7 +146,7 @@ const Navbar: React.FC = () => {
 							animate={{ x: 0, opacity: 1 }}
 							exit={{ x: 400, opacity: 0 }}
 							transition={{ type: "spring", stiffness: 400, damping: 40 }}
-							className="fixed top-0 right-0 h-full w-[420px] bg-[#1a1333] shadow-2xl z-[100] border-l border-white/10 rounded-l-2xl p-6 hidden md:block"
+							className="fixed top-0 right-0 h-full w-[420px] bg-[#1a1333] shadow-2xl z-[100] border-l border-white/10 rounded-l-2xl p-6 hidden md:block cart-slider-area"
 						>
 							<div className="flex justify-between items-center mb-2">
 								<span className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-geist-mono), Geist Mono, monospace', letterSpacing: '0.04em' }}>Cart</span>
